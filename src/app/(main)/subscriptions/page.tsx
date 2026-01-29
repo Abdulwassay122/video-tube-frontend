@@ -51,12 +51,12 @@ export default function SubscribedVideos() {
         "GET",
         `${apiUrl}/api/v1/videos/subscriprtion?page=${pageNo}&limit=10`,
         {},
-        router
+        router,
       );
 
       if (res?.success) {
         setVideos((prev) =>
-          pageNo === 1 ? res.data.videos : [...prev, ...res.data.videos]
+          pageNo === 1 ? res.data.videos : [...prev, ...res.data.videos],
         );
         setTotalPages(res.data.totalPages);
       }
@@ -71,7 +71,7 @@ export default function SubscribedVideos() {
     if (user) fetchSubscribedVideos(1);
   }, [user]);
 
-  /* 🔐 Not authenticated */
+  /* Not authenticated */
   if (!user) {
     return (
       <NotAuthenticated message="Login to see videos from channels you subscribe to." />
@@ -81,9 +81,9 @@ export default function SubscribedVideos() {
   return (
     <Box className="">
       {/* Header */}
-      <Typography variant="h6" className="font-semibold mb-4">
+      {/* <Typography variant="h6" className="font-semibold mb-4">
         Subscriptions
-      </Typography>
+      </Typography> */}
 
       {/* Empty State */}
       {!loading && videos.length === 0 && (
@@ -95,7 +95,7 @@ export default function SubscribedVideos() {
       {/* Videos */}
       <Grid container spacing={2}>
         {videos.map((video, i) => (
-          <Grid size={4} key={i}>
+          <Grid size={{ md: 4, sm: 6, xs: 12 }}  key={i}>
             <VideoCard
               id={video._id}
               thumbnail={video.thumbnail}

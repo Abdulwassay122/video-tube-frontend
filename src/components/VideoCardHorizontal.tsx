@@ -17,7 +17,6 @@ type Props = {
 export default function VideoCardHoriontal({
   id,
   thumbnail,
-  avatar,
   title,
   fullName,
   views,

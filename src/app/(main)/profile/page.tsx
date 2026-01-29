@@ -58,7 +58,7 @@ export default function page() {
     try {
       const res = await apiRequest(
         "GET",
-        `${apiUrl}/api/v1/users/profile/${username}/${
+        `${apiUrl}/api/v1/users/profile/${encodeURIComponent(username)}/${
           user === null ? "auth" : ""
         }`,
         {},
@@ -86,7 +86,7 @@ export default function page() {
       // Assuming you have subscribe toggle endpoint
       const res = await apiRequest(
         "POST",
-        `${apiUrl}/api/v1/subscriptions/c/${data._id}`,
+        `${apiUrl}/api/v1/subscriptions/c/${encodeURIComponent(data._id)}`,
         {},
         router,
       );
@@ -169,10 +169,10 @@ export default function page() {
       </Box>
 
       {/* Videos Section */}
-      <Box className="px-4 md:px-8 pb-6">
-        <Typography variant="h6" className="font-semibold mb-4">
+      <Box className="sm:px-4 md:px-8 pb-6">
+        {/* <Typography variant="h6" className="font-semibold mb-4">
           Videos
-        </Typography>
+        </Typography> */}
         {data.videos.length === 0 ? (
           <Typography className="text-gray-500">No videos yet.</Typography>
         ) : (

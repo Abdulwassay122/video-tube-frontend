@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { Box, CircularProgress, Grid } from "@mui/material";
 import { apiRequest } from "@/utils/apiRequest";
-import { useRouter } from "next/navigation";
-import VideoCard from "./VideoCard";
+import { useRouter, useSearchParams } from "next/navigation";
+import VideoCard from "@/components/VideoCard";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function page() {
@@ -17,11 +17,18 @@ export default function page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const params = useSearchParams();
+
+  const query = params.get("search");
+  console.log("qq", query);
+
   const fetchVideos = async (pageNumber = 1) => {
+    if (!query) return;
+
     try {
       const res = await apiRequest(
         "GET",
-        `${apiUrl}/api/v1/videos?page=${pageNumber}&limit=10`,
+        `${apiUrl}/api/v1/videos?query=${query}&page=${pageNumber}&limit=10`,
         {},
         router,
       );
@@ -33,14 +40,16 @@ export default function page() {
       setPage(pageNumber);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
+      console.log(err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    if (!query) router.push("/");
     fetchVideos(1);
-  }, []);
+  }, [query]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -58,7 +67,6 @@ export default function page() {
           </Box>
         }
       >
-        {" "}
         <Grid container spacing={2}>
           {data?.map((item: any, i: number) => (
             <Grid size={{ md: 4, sm: 6, xs: 12 }} key={i}>

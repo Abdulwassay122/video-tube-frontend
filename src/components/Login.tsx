@@ -46,7 +46,7 @@ export default function Login() {
   };
 
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>(
-    {}
+    {},
   );
   function validateForm(formData: FormData) {
     const newErrors: Partial<Record<keyof FormData, string>> = {};
@@ -84,7 +84,7 @@ export default function Login() {
           email: formData.email,
           password: formData.password,
         },
-        router
+        router,
       );
 
       // SUCCESS: backend message and data exactly
@@ -101,49 +101,49 @@ export default function Login() {
     }
   }
 
-  async function handlerefresh() {
-    try {
-      // Use centralized apiRequest helper instead of axios directly
-      const data = await apiRequest(
-        "POST",
-        `${apiUrl}/api/v1/users/refresh-token`,
-        {
-          email: formData.email,
-          password: formData.password,
-        },
-        router
-      );
+  // async function handlerefresh() {
+  //   try {
+  //     // Use centralized apiRequest helper instead of axios directly
+  //     const data = await apiRequest(
+  //       "POST",
+  //       `${apiUrl}/api/v1/users/refresh-token`,
+  //       {
+  //         email: formData.email,
+  //         password: formData.password,
+  //       },
+  //       router
+  //     );
 
-      // SUCCESS: backend message and data exactly
-      toast.success(data.message);
-      console.log("User:", data.data);
-    } catch (error: any) {
-      // ERROR: backend message exactly
-      const message = error?.message || "Something went wrong";
-      toast.error(message);
-      setError(message);
-    }
-  }
+  //     // SUCCESS: backend message and data exactly
+  //     toast.success(data.message);
+  //     console.log("User:", data.data);
+  //   } catch (error: any) {
+  //     // ERROR: backend message exactly
+  //     const message = error?.message || "Something went wrong";
+  //     toast.error(message);
+  //     setError(message);
+  //   }
+  // }
 
-  async function handleLogout() {
-    try {
-      // Use centralized apiRequest helper instead of axios directly
-      const data = await apiRequest(
-        "POST",
-        `${apiUrl}/api/v1/users/logout`,
-        router
-      );
+  // async function handleLogout() {
+  //   try {
+  //     // Use centralized apiRequest helper instead of axios directly
+  //     const data = await apiRequest(
+  //       "POST",
+  //       `${apiUrl}/api/v1/users/logout`,
+  //       router
+  //     );
 
-      // SUCCESS: backend message and data exactly
-      toast.success(data.message);
-      console.log("User:", data.data);
-    } catch (error: any) {
-      // ERROR: backend message exactly
-      const message = error?.message || "Something went wrong";
-      toast.error(message);
-      setError(message);
-    }
-  }
+  //     // SUCCESS: backend message and data exactly
+  //     toast.success(data.message);
+  //     console.log("User:", data.data);
+  //   } catch (error: any) {
+  //     // ERROR: backend message exactly
+  //     const message = error?.message || "Something went wrong";
+  //     toast.error(message);
+  //     setError(message);
+  //   }
+  // }
 
   return (
     <Container
@@ -158,8 +158,8 @@ export default function Login() {
       <Paper
         elevation={4}
         sx={{
-          width: "80%",
-          p: 4,
+          width: { sm: "80%" },
+          p: { xs: 3, sm: 4 },
           borderRadius: 3,
           textAlign: "center",
         }}
@@ -237,9 +237,10 @@ export default function Login() {
 
         <Box
           sx={{
-            // display: "flex",
-            gap: 2,
-            mt: 2,
+            display: "flex",
+            flexDirection: "column", // vertical stack
+            gap: 2, // space between children
+            mt: 2, // margin-top of the whole Box
           }}
         >
           {/* Login Button */}
@@ -249,22 +250,18 @@ export default function Login() {
             fullWidth
             sx={{ mt: 2, py: 1.2 }}
             onClick={submitForm}
+            className="mb-2"
           >
             Login
           </Button>
-
           {/* Register Button */}
-          <Link href={"/user-register"}>
-            <Button
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 2, py: 1.2 }}
-            >
-              Register
-            </Button>
-          </Link>
-          <Button
+          <Link
+            href="/user-register"
+            style={{ color: "#1976d2" }} // optional styling
+          >
+            Register User
+          </Link>{" "}
+          {/* <Button
             variant="outlined"
             size="small"
             fullWidth
@@ -281,7 +278,7 @@ export default function Login() {
             onClick={handleLogout}
           >
             Logout
-          </Button>
+          </Button> */}
         </Box>
       </Paper>
     </Container>

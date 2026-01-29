@@ -13,7 +13,7 @@ export async function apiRequest<T = any>(
       url,
       data: body,
       withCredentials: true,
-      headers: { "Content-Type": "application/json" },
+      // headers: { "Content-Type": "application/json" },
     });
 
     // success: return EXACT backend response

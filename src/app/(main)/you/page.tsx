@@ -42,6 +42,7 @@ export default function UserHistory() {
   const router = useRouter();
 
   const [userData, setUserData] = useState<UserDetail | null>(null);
+  const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchUserDetail = async () => {
@@ -55,26 +56,42 @@ export default function UserHistory() {
       setLoading(false);
     }
   };
+  const getWatchHistory = async () => {
+    setLoading(true);
+    try {
+      const res = await apiRequest("GET", `${apiUrl}/api/v1/users/history`);
+      if (res?.success) setHistory(res.data);
+      console.log(history);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (user) fetchUserDetail();
+    if (user) getWatchHistory();
   }, [user]);
 
   if (!user)
     return <NotAuthenticated message="Login to see your watch history." />;
 
-  if (loading) return <CircularProgress className="mx-auto mt-10" />;
+  if (loading) return "Loading...";
 
   return (
-    <Box className="px-4 md:px-8 mt-6">
+    <Box className="sm:px-4 mt-6">
       {/* User Info */}
       <Box
-        className="flex items-center gap-4 mb-6 cursor-pointer"
+        className="flex flex-col sm:flex-row sm:text-left text-center items-center gap-4 mb-6 cursor-pointer"
         onClick={() => router.push(`/profile?username=${userData?.username}`)}
       >
         <Avatar src={userData?.avatar} sx={{ width: 120, height: 120 }} />
         <Box>
-          <Typography variant="h6" sx={{fontWeight:700, fontSize:"30px"}}>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 700, fontSize: { xs: "20px", sm: "30px" } }}
+          >
             {userData?.fullName}
           </Typography>
           <Typography variant="body2" className="text-gray-500">
@@ -84,26 +101,30 @@ export default function UserHistory() {
       </Box>
 
       {/* Watch History */}
-      <Typography variant="h6" sx={{fontWeight:600, fontSize:"20px"}}>
+      <Typography
+        variant="h6"
+        className="sm:text-left text-center"
+        sx={{ fontWeight: 600, fontSize: "20px" }}
+      >
         Watch History
       </Typography>
 
-      {userData?.watchHistory.length === 0 ? (
+      {history?.length === 0 ? (
         <Typography className="text-gray-500">
           You haven't watched any videos yet.
         </Typography>
       ) : (
         <Grid container spacing={2}>
-          {userData?.watchHistory.map((video, i) => (
-            <Grid size={4} key={i}>
+          {history.map((ele, i) => (
+            <Grid size={{ md: 4, sm: 6, xs: 12 }} key={i}>
               <VideoCard
-                id={video._id}
-                thumbnail={video.thumbnail}
-                avatar={video.owner.avatar}
-                fullName={video.owner.fullName}
-                views={video.views}
-                createdAt={video.createdAt}
-                title={video.title}
+                id={ele._id}
+                thumbnail={ele.thumbnail}
+                avatar={ele.owner.avatar}
+                fullName={ele.owner.fullName}
+                views={ele.views}
+                createdAt={ele.createdAt}
+                title={ele.title}
               />
             </Grid>
           ))}

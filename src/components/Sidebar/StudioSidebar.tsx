@@ -277,21 +277,24 @@ export default function StudioSidebar({
           >
             <MenuIcon />
           </IconButton>
+          <Box className="flex justify-between w-full items-center">
+            {/* Logo */}
+            <Link href="/studio">
+              <Typography
+                variant="h6"
+                noWrap
+                component="div"
+                sx={{
+                  display: { xs: "none", sm: "block" },
+                  fontWeight: "bold",
+                }}
+              >
+                WeTube Studio
+              </Typography>
+            </Link>
 
-          {/* Logo */}
-          <Link href="/studio">
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ display: { xs: "none", sm: "block" }, fontWeight: "bold" }}
-            >
-              WeTube Studio
-            </Typography>
-          </Link>
-
-          {/* Search Bar */}
-          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+            {/* Search Bar */}
+            {/* <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
             <Search>
               <SearchIconWrapper>
                 <SearchIcon />
@@ -301,134 +304,138 @@ export default function StudioSidebar({
                 inputProps={{ "aria-label": "search" }}
               />
             </Search>
-          </Box>
+          </Box> */}
 
-          {/* Icons */}
-          {user !== null ? (
-            <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              <IconButton size="large" color="inherit">
-                <VideoCallIcon />
-              </IconButton>
-              <IconButton size="large" color="inherit">
-                <NotificationsIcon />
-              </IconButton>
-              <IconButton onClick={handleClick} size="large" color="inherit">
-                <Avatar
-                  src={user?.avatar}
-                  alt={user?.username}
-                  sx={{ width: 32, height: 32 }}
-                />
-              </IconButton>
-              <Menu
-                anchorEl={anchorEl}
-                id="account-menu"
-                open={openn}
-                onClose={handleClose}
-                onClick={handleClose}
-                slotProps={{
-                  paper: {
-                    elevation: 0,
-                    sx: {
-                      overflow: "visible",
-                      filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-                      mt: 1.5,
-                      "& .MuiAvatar-root": {
-                        width: 32,
-                        height: 32,
-                        ml: -0.5,
-                        mr: 1,
-                      },
-                      "&::before": {
-                        content: '""',
-                        display: "block",
-                        position: "absolute",
-                        top: 0,
-                        right: 14,
-                        width: 10,
-                        height: 10,
-                        bgcolor: "background.paper",
-                        transform: "translateY(-50%) rotate(45deg)",
-                        zIndex: 0,
-                      },
-                    },
-                  },
-                }}
-                transformOrigin={{ horizontal: "right", vertical: "top" }}
-                anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+            {/* Icons */}
+            {user !== null ? (
+              <Box sx={{ display: { xs: "none", md: "flex" } }}>
+                {/* <IconButton
+                onClick={() => router.push("/studio/videos")}
+                size="large"
+                color="inherit"
               >
-                <MenuItem
-                  onClick={() =>
-                    router.push(`/profile?username=${user?.username}`)
-                  }
-                >
+                <VideoCallIcon />
+              </IconButton> */}
+                <IconButton onClick={handleClick} size="large" color="inherit">
                   <Avatar
                     src={user?.avatar}
                     alt={user?.username}
                     sx={{ width: 32, height: 32 }}
-                  />{" "}
-                  Profile
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={() => router.push("/user-login")}>
-                  <ListItemIcon>
-                    <PersonAdd fontSize="small" />
-                  </ListItemIcon>
-                  Add another account
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                  <ListItemIcon>
-                    <Settings fontSize="small" />
-                  </ListItemIcon>
-                  Settings
-                </MenuItem>
-                <MenuItem onClick={handleLogout}>
-                  <ListItemIcon>
-                    <Logout fontSize="small" />
-                  </ListItemIcon>
-                  Logout
-                </MenuItem>
-              </Menu>
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                display: { xs: "none", md: "flex" },
-                gap: 1,
-                alignItems: "center",
-              }}
-            >
-              {/* Login */}
-              <Button
-                onClick={() => router.push("/user-login")}
-                variant="contained"
-                size="small"
+                  />
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  id="account-menu"
+                  open={openn}
+                  onClose={handleClose}
+                  onClick={handleClose}
+                  slotProps={{
+                    paper: {
+                      elevation: 0,
+                      sx: {
+                        overflow: "visible",
+                        filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                        mt: 1.5,
+                        "& .MuiAvatar-root": {
+                          width: 32,
+                          height: 32,
+                          ml: -0.5,
+                          mr: 1,
+                        },
+                        "&::before": {
+                          content: '""',
+                          display: "block",
+                          position: "absolute",
+                          top: 0,
+                          right: 14,
+                          width: 10,
+                          height: 10,
+                          bgcolor: "background.paper",
+                          transform: "translateY(-50%) rotate(45deg)",
+                          zIndex: 0,
+                        },
+                      },
+                    },
+                  }}
+                  transformOrigin={{ horizontal: "right", vertical: "top" }}
+                  anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+                >
+                  <MenuItem
+                    onClick={() =>
+                      router.push(
+                        `/profile?username=${encodeURIComponent(user?.username)}`,
+                      )
+                    }
+                  >
+                    <Avatar
+                      src={user?.avatar}
+                      alt={user?.username}
+                      sx={{ width: 32, height: 32 }}
+                    />{" "}
+                    Profile
+                  </MenuItem>
+                  <Divider />
+                  <MenuItem onClick={() => router.push("/user-login")}>
+                    <ListItemIcon>
+                      <PersonAdd fontSize="small" />
+                    </ListItemIcon>
+                    Add another account
+                  </MenuItem>
+                  <MenuItem onClick={handleClose}>
+                    <ListItemIcon>
+                      <Settings fontSize="small" />
+                    </ListItemIcon>
+                    Settings
+                  </MenuItem>
+                  <MenuItem onClick={handleLogout}>
+                    <ListItemIcon>
+                      <Logout fontSize="small" />
+                    </ListItemIcon>
+                    Logout
+                  </MenuItem>
+                </Menu>
+              </Box>
+            ) : (
+              <Box
                 sx={{
-                  backgroundColor: "#fff",
-                  color: "#000",
-                  "&:hover": { backgroundColor: "#f0f0f0" },
+                  display: { xs: "none", md: "flex" },
+                  gap: 1,
+                  alignItems: "center",
                 }}
               >
-                Login
-              </Button>
+                {/* Login */}
+                <Button
+                  onClick={() => router.push("/user-login")}
+                  variant="contained"
+                  size="small"
+                  sx={{
+                    backgroundColor: "#fff",
+                    color: "#000",
+                    "&:hover": { backgroundColor: "#f0f0f0" },
+                  }}
+                >
+                  Login
+                </Button>
 
-              {/* Sign Up */}
-              <Button
-                onClick={() => router.push("/user-register")}
-                variant="outlined"
-                size="small"
-                sx={{
-                  borderColor: "#fff",
-                  color: "#fff",
-                  "&:hover": {
+                {/* Sign Up */}
+                <Button
+                  onClick={() => router.push("/user-register")}
+                  variant="outlined"
+                  size="small"
+                  sx={{
                     borderColor: "#fff",
-                    backgroundColor: "rgba(255,255,255,0.1)",
-                  },
-                }}
-              >
-                Sign up
-              </Button>
-            </Box>
-          )}
+                    color: "#fff",
+                    "&:hover": {
+                      borderColor: "#fff",
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                    },
+                  }}
+                >
+                  Sign up
+                </Button>
+              </Box>
+            )}
+          </Box>
         </Toolbar>
       </AppBar>
 

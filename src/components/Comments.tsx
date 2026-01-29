@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 
 import { apiRequest } from "@/utils/apiRequest";
 import { timeAgo } from "@/utils/format";
+import { useUser } from "@/app/context/UserContext";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 // types/comment.ts
@@ -45,6 +46,7 @@ interface CommentResponse {
 
 const CommentSection = ({ videoId }: { videoId: string }) => {
   const router = useRouter();
+  const { user } = useUser();
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [content, setContent] = useState("");
@@ -58,18 +60,19 @@ const CommentSection = ({ videoId }: { videoId: string }) => {
     setLoading(true);
     const res = await apiRequest<{ data: CommentResponse }>(
       "GET",
-      `${apiUrl}/api/v1/comments/${videoId}?page=${pageNo}&limit=10`,
+      `${apiUrl}/api/v1/comments/${videoId}${user === null ? "" : "/auth"}?page=${pageNo}&limit=10`,
       {},
-      router
+      router,
     );
 
     if (res?.data) {
       setComments((prev) =>
-        pageNo === 1 ? res.data.comments : [...prev, ...res.data.comments]
+        pageNo === 1 ? res.data.comments : [...prev, ...res.data.comments],
       );
       setTotalPages(res.data.totalPages);
       setTotalComments(res.data.totalComments);
     }
+    console.log(res);
     setLoading(false);
   };
 
@@ -81,7 +84,7 @@ const CommentSection = ({ videoId }: { videoId: string }) => {
       "POST",
       `${apiUrl}/api/v1/comments/${videoId}`,
       { content },
-      router
+      router,
     );
 
     if (res?.success) {
@@ -97,7 +100,7 @@ const CommentSection = ({ videoId }: { videoId: string }) => {
       "POST",
       `${apiUrl}/api/v1/likes/toggle/c/${commentId}`,
       {},
-      router
+      router,
     );
 
     setComments((prev) =>
@@ -108,8 +111,8 @@ const CommentSection = ({ videoId }: { videoId: string }) => {
               isLiked: !c.isLiked,
               likesCount: c.isLiked ? c.likesCount - 1 : c.likesCount + 1,
             }
-          : c
-      )
+          : c,
+      ),
     );
   };
 

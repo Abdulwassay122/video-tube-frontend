@@ -6,19 +6,16 @@ import {
   Container,
   IconButton,
   InputAdornment,
-  InputBase,
   Paper,
   TextField,
   Typography,
-  useTheme,
 } from "@mui/material";
 import Link from "next/link";
-import React, { ChangeEvent, useRef, useState } from "react";
-import { Fullscreen, Visibility, VisibilityOff } from "@mui/icons-material";
+import { ChangeEvent, useRef, useState } from "react";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Spinner from "./assets/Iphone-spinner-2.gif";
 import Image from "next/image";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { apiRequest } from "@/utils/apiRequest";
 
 type FormData = {
@@ -61,7 +58,7 @@ export default function Register() {
 
   const handleFileChange = (
     e: ChangeEvent<HTMLInputElement>,
-    field: "avatar" | "coverImage"
+    field: "avatar" | "coverImage",
   ) => {
     if (e.target.files && e.target.files[0]) {
       setFormData((prev) => ({
@@ -73,7 +70,7 @@ export default function Register() {
 
   // for validation
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>(
-    {}
+    {},
   );
 
   function validateForm(formData: FormData) {
@@ -133,7 +130,7 @@ export default function Register() {
       const res = await apiRequest(
         "POST",
         `${apiUrl}/api/v1/users/register`,
-        form
+        form,
       );
 
       toast.success(res.message);
@@ -160,8 +157,8 @@ export default function Register() {
       <Paper
         elevation={4}
         sx={{
-          width: "80%",
-          p: 4,
+          width: { sm: "80%" },
+          p: { xs: 3, sm: 4 },
           my: 5,
           borderRadius: 3,
           textAlign: "center",
@@ -481,12 +478,13 @@ export default function Register() {
         {/* Buttons  */}
         <Box
           sx={{
-            // display: "flex",
-            gap: 2,
-            mt: 2,
+            display: "flex",
+            flexDirection: "column", // vertical stack
+            gap: 2, // space between children
+            mt: 2, // margin-top of the whole Box
           }}
         >
-          {/* Login Button */}
+          {/* Register Button */}
           <Button
             variant="contained"
             size="small"
@@ -497,16 +495,12 @@ export default function Register() {
             Register
           </Button>
 
-          {/* Register Button */}
-          <Link href={"/user-login"}>
-            <Button
-              variant="outlined"
-              size="small"
-              fullWidth
-              sx={{ mt: 2, py: 1.2 }}
-            >
-              Login
-            </Button>
+          {/* Login Button */}
+          <Link
+            href="/user-login"
+            style={{ color: "#1976d2" }} // optional styling
+          >
+            Login User
           </Link>
         </Box>
       </Paper>

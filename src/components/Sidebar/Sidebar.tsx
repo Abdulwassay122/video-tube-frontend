@@ -30,6 +30,7 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import HomeIcon from "@mui/icons-material/Home";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 import SubscriptionsOutlinedIcon from "@mui/icons-material/SubscriptionsOutlined";
 import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
@@ -37,13 +38,54 @@ import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
 import PlaylistPlayOutlinedIcon from "@mui/icons-material/PlaylistPlayOutlined";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 
-import SlowMotionVideoOutlinedIcon from '@mui/icons-material/SlowMotionVideoOutlined';
+import SlowMotionVideoOutlinedIcon from "@mui/icons-material/SlowMotionVideoOutlined";
 import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
 import PersonIcon from "@mui/icons-material/Person";
 import { Logout, PersonAdd, Settings } from "@mui/icons-material";
 import { apiRequest } from "@/utils/apiRequest";
 import { apiUrl } from "@/utils/format";
 import { toast } from "react-toastify";
+
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "inherit",
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    [theme.breakpoints.up("sm")]: {
+      width: "35ch",
+      "&:focus": {
+        width: "55ch",
+      },
+    },
+  },
+}));
+
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: "100px",
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginLeft: 0,
+  width: "100%",
+  [theme.breakpoints.up("sm")]: {
+    marginLeft: theme.spacing(1),
+    width: "auto",
+  },
+}));
 
 const sidebarItems = [
   {
@@ -165,6 +207,10 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 
   const [open, setOpen] = React.useState(false);
 
+  const [search, setSearch] = React.useState<string>("");
+
+  const isMobile = useMediaQuery("(max-width:500px)");
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -172,48 +218,6 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-
-  const SearchIconWrapper = styled("div")(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: "100%",
-    position: "absolute",
-    pointerEvents: "none",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  }));
-
-  const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: "inherit",
-    "& .MuiInputBase-input": {
-      padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-      transition: theme.transitions.create("width"),
-      width: "100%",
-      [theme.breakpoints.up("sm")]: {
-        width: "35ch",
-        "&:focus": {
-          width: "55ch",
-        },
-      },
-    },
-  }));
-
-  const Search = styled("div")(({ theme }) => ({
-    position: "relative",
-    borderRadius: "100px",
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    "&:hover": {
-      backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginLeft: 0,
-    width: "100%",
-    [theme.breakpoints.up("sm")]: {
-      marginLeft: theme.spacing(1),
-      width: "auto",
-    },
-  }));
 
   // for avatar drop down menu
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -232,7 +236,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
       const data = await apiRequest(
         "POST",
         `${apiUrl}/api/v1/users/logout`,
-        router
+        router,
       );
 
       // SUCCESS: backend message and data exactly
@@ -247,12 +251,28 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (search.trim().length > 0) {
+        router.push(`/search?search=${encodeURIComponent(search)}`);
+      } else {
+        router.push(`/`);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [search]);
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          <IconButton
+          {!isMobile && <IconButton
             color="inherit"
             aria-label="open drawer"
             onClick={handleDrawerOpen}
@@ -265,7 +285,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
             ]}
           >
             <MenuIcon />
-          </IconButton>
+          </IconButton>}
 
           {/* Logo */}
           <Link href="/">
@@ -286,20 +306,24 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                 <SearchIcon />
               </SearchIconWrapper>
               <StyledInputBase
-                placeholder="Search…"
-                inputProps={{ "aria-label": "search" }}
+                onChange={handleSearch}
+                value={search}
+                placeholder="Search"
+                // inputProps={{ "aria-label": "search" }}
               />
             </Search>
           </Box>
 
           {/* Icons */}
           {user !== null ? (
-            <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              <IconButton size="large" color="inherit">
+            <Box sx={{ display: "flex" }}>
+              <IconButton
+                type="button"
+                onClick={() => router.push("/studio/videos")}
+                size="large"
+                color="inherit"
+              >
                 <VideoCallIcon />
-              </IconButton>
-              <IconButton size="large" color="inherit">
-                <NotificationsIcon />
               </IconButton>
               <IconButton onClick={handleClick} size="large" color="inherit">
                 <Avatar
@@ -345,7 +369,13 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                 transformOrigin={{ horizontal: "right", vertical: "top" }}
                 anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
               >
-                <MenuItem onClick={() => router.push(`/profile?username=${user?.username}`)}>
+                <MenuItem
+                  onClick={() =>
+                    router.push(
+                      `/profile?username=${encodeURIComponent(user?.username)}`,
+                    )
+                  }
+                >
                   <Avatar
                     src={user?.avatar}
                     alt={user?.username}
@@ -366,12 +396,12 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                   </ListItemIcon>
                   Studio
                 </MenuItem>
-                <MenuItem onClick={handleClose}>
+                {/* <MenuItem onClick={handleClose}>
                   <ListItemIcon>
                     <Settings fontSize="small" />
                   </ListItemIcon>
                   Settings
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem onClick={handleLogout}>
                   <ListItemIcon>
                     <Logout fontSize="small" />
@@ -423,59 +453,102 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
         </Toolbar>
       </AppBar>
 
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
+      {!isMobile && (
+        <Drawer variant="permanent" open={open}>
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === "rtl" ? (
+                <ChevronRightIcon />
+              ) : (
+                <ChevronLeftIcon />
+              )}
+            </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            {sidebarItems.map(({ label, href, icon, activeIcon }) => {
+              const isActive = pathname === href;
+
+              return (
+                <ListItem key={label} disablePadding sx={{ display: "block" }}>
+                  <ListItemButton
+                    component={Link}
+                    href={href}
+                    selected={isActive}
+                    sx={{
+                      minHeight: 48,
+                      px: 2.5,
+                      justifyContent: open ? "initial" : "center",
+                      borderRadius: "10px",
+                      mx: 1,
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        justifyContent: "center",
+                        mr: open ? 3 : "auto",
+                      }}
+                    >
+                      {isActive ? activeIcon : icon}
+                    </ListItemIcon>
+
+                    <ListItemText
+                      primary={label}
+                      sx={{
+                        opacity: open ? 1 : 0,
+                        fontWeight: isActive ? 600 : 400,
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
+          </List>
+        </Drawer>
+      )}
+
+      {isMobile && (
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 56,
+            display: "flex",
+            justifyContent: "space-around",
+            alignItems: "center",
+            backgroundColor: theme.palette.background.paper,
+            borderTop: "1px solid rgba(0,0,0,0.1)",
+            zIndex: theme.zIndex.appBar,
+          }}
+        >
           {sidebarItems.map(({ label, href, icon, activeIcon }) => {
             const isActive = pathname === href;
 
             return (
-              <ListItem key={label} disablePadding sx={{ display: "block" }}>
-                <ListItemButton
-                  component={Link}
-                  href={href}
-                  selected={isActive}
-                  sx={{
-                    minHeight: 48,
-                    px: 2.5,
-                    justifyContent: open ? "initial" : "center",
-                    borderRadius: "10px",
-                    mx: 1,
-                  }}
-                >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      justifyContent: "center",
-                      mr: open ? 3 : "auto",
-                    }}
-                  >
-                    {isActive ? activeIcon : icon}
-                  </ListItemIcon>
-
-                  <ListItemText
-                    primary={label}
-                    sx={{
-                      opacity: open ? 1 : 0,
-                      fontWeight: isActive ? 600 : 400,
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
+              <IconButton
+                key={label}
+                onClick={() => router.push(href)}
+                color={isActive ? "primary" : "default"}
+              >
+                {isActive ? activeIcon : icon}
+              </IconButton>
             );
           })}
-        </List>
-      </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        </Box>
+      )}
+
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: isMobile ? 1 : 3,
+          pb: isMobile ? "80px" : 3,
+        }}
+      >
+        {" "}
         <DrawerHeader />
         {children}
       </Box>

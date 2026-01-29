@@ -62,7 +62,7 @@ export function formatSubscribers(count: number): string {
   }
 
   return `${(count / 1_000_000_000).toFixed(
-    count % 1_000_000_000 === 0 ? 0 : 1
+    count % 1_000_000_000 === 0 ? 0 : 1,
   )}B`;
 }
 
@@ -93,7 +93,7 @@ export default function page() {
         "GET",
         `${apiUrl}/api/v1/videos/${videoId}/${user !== null ? "" : "unauth"}`,
         {},
-        router
+        router,
       );
       setData(response.data);
     } catch (error: any) {
@@ -108,7 +108,7 @@ export default function page() {
       "POST",
       `${apiUrl}/api/v1/subscriptions/c/${data?.owner._id}`,
       {},
-      router
+      router,
     );
 
     if (res?.success) {
@@ -120,7 +120,7 @@ export default function page() {
               ...prev.owner,
               isSubscribed: !prev.owner.isSubscribed,
             },
-          }
+          },
       );
     }
   }
@@ -134,10 +134,13 @@ export default function page() {
         "GET",
         `${apiUrl}/api/v1/videos`,
         {},
-        router
+        router,
       );
       setVideoData(
-        response.data.videos.filter((video: any) => video._id !== videoId)
+        response.data.videos.filter((video: any) => video._id !== videoId),
+      );
+      console.log(
+        response.data.videos.filter((video: any) => video._id !== videoId),
       );
     } catch (error: any) {
       setError(error.message);
@@ -151,7 +154,7 @@ export default function page() {
       "POST",
       `${apiUrl}/api/v1/likes/toggle/v/${videoId}`,
       {},
-      router
+      router,
     );
 
     if (res?.success) {
@@ -160,7 +163,7 @@ export default function page() {
           prev && {
             ...prev,
             isLiked: !prev.isLiked,
-          }
+          },
       );
     }
   }
@@ -169,7 +172,7 @@ export default function page() {
     fetchApi();
     fetchApiVideos();
     console.log(videoData);
-  }, []);
+  }, [videoId]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
