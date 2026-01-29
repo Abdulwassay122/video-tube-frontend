@@ -24,7 +24,7 @@ import InputBase from "@mui/material/InputBase";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import { alpha } from "@mui/material/styles";
 import { useUser } from "@/app/context/UserContext";
-import { Avatar, Button, Menu, MenuItem } from "@mui/material";
+import { Avatar, Button, Menu, MenuItem, useMediaQuery } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
@@ -176,6 +176,8 @@ export default function StudioSidebar({
 
   const [open, setOpen] = React.useState(false);
 
+  const isMobile = useMediaQuery("(max-width:500px)");
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -263,7 +265,7 @@ export default function StudioSidebar({
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          <IconButton
+          {!isMobile&&<IconButton
             color="inherit"
             aria-label="open drawer"
             onClick={handleDrawerOpen}
@@ -276,7 +278,7 @@ export default function StudioSidebar({
             ]}
           >
             <MenuIcon />
-          </IconButton>
+          </IconButton>}
           <Box className="flex justify-between w-full items-center">
             {/* Logo */}
             <Link href="/studio">
@@ -285,7 +287,7 @@ export default function StudioSidebar({
                 noWrap
                 component="div"
                 sx={{
-                  display: { xs: "none", sm: "block" },
+                  display: { sm: "block" },
                   fontWeight: "bold",
                 }}
               >
@@ -308,7 +310,7 @@ export default function StudioSidebar({
 
             {/* Icons */}
             {user !== null ? (
-              <Box sx={{ display: { xs: "none", md: "flex" } }}>
+              <Box sx={{ display: { md: "flex" } }}>
                 {/* <IconButton
                 onClick={() => router.push("/studio/videos")}
                 size="large"
@@ -439,59 +441,100 @@ export default function StudioSidebar({
         </Toolbar>
       </AppBar>
 
-      <Drawer variant="permanent" open={open}>
-        <DrawerHeader>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
+      {!isMobile && (
+        <Drawer variant="permanent" open={open}>
+          <DrawerHeader>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === "rtl" ? (
+                <ChevronRightIcon />
+              ) : (
+                <ChevronLeftIcon />
+              )}
+            </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            {sidebarItems.map(({ label, href, icon, activeIcon }) => {
+              const isActive = pathname === href;
+
+              return (
+                <ListItem key={label} disablePadding sx={{ display: "block" }}>
+                  <ListItemButton
+                    component={Link}
+                    href={href}
+                    selected={isActive}
+                    sx={{
+                      minHeight: 48,
+                      px: 2.5,
+                      justifyContent: open ? "initial" : "center",
+                      borderRadius: "10px",
+                      mx: 1,
+                    }}
+                  >
+                    <ListItemIcon
+                      sx={{
+                        minWidth: 0,
+                        justifyContent: "center",
+                        mr: open ? 3 : "auto",
+                      }}
+                    >
+                      {isActive ? activeIcon : icon}
+                    </ListItemIcon>
+
+                    <ListItemText
+                      primary={label}
+                      sx={{
+                        opacity: open ? 1 : 0,
+                        fontWeight: isActive ? 600 : 400,
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
+          </List>
+        </Drawer>
+      )}
+
+      {isMobile && (
+        <Box
+          sx={{
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 56,
+            display: "flex",
+            justifyContent: "space-around",
+            alignItems: "center",
+            backgroundColor: theme.palette.background.paper,
+            borderTop: "1px solid rgba(0,0,0,0.1)",
+            zIndex: theme.zIndex.appBar,
+          }}
+        >
           {sidebarItems.map(({ label, href, icon, activeIcon }) => {
             const isActive = pathname === href;
 
             return (
-              <ListItem key={label} disablePadding sx={{ display: "block" }}>
-                <ListItemButton
-                  component={Link}
-                  href={href}
-                  selected={isActive}
-                  sx={{
-                    minHeight: 48,
-                    px: 2.5,
-                    justifyContent: open ? "initial" : "center",
-                    borderRadius: "10px",
-                    mx: 1,
-                  }}
-                >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      justifyContent: "center",
-                      mr: open ? 3 : "auto",
-                    }}
-                  >
-                    {isActive ? activeIcon : icon}
-                  </ListItemIcon>
-
-                  <ListItemText
-                    primary={label}
-                    sx={{
-                      opacity: open ? 1 : 0,
-                      fontWeight: isActive ? 600 : 400,
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
+              <IconButton
+                key={label}
+                onClick={() => router.push(href)}
+                color={isActive ? "primary" : "default"}
+              >
+                {isActive ? activeIcon : icon}
+              </IconButton>
             );
           })}
-        </List>
-      </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        </Box>
+      )}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: isMobile ? 1 : 3,
+          pb: isMobile ? "80px" : 3,
+        }}
+      >
         <DrawerHeader />
         {children}
       </Box>

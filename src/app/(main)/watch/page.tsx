@@ -8,6 +8,9 @@ import {
   CardContent,
   Grid,
   Typography,
+  Collapse,
+  IconButton,
+  useMediaQuery,
 } from "@mui/material";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -16,12 +19,15 @@ import "plyr-react/plyr.css";
 import Image from "next/image";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutlined";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import { timeAgo } from "@/utils/format";
 import CommentSection from "@/components/Comments";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import VideoCardHoriontal from "@/components/VideoCardHorizontal";
 import { useUser } from "@/app/context/UserContext";
 import Link from "next/link";
+import VideoCard from "@/components/VideoCard";
 
 type video = {
   _id: string;
@@ -52,18 +58,11 @@ type video = {
 
 export function formatSubscribers(count: number): string {
   if (count < 1000) return count.toString();
-
-  if (count < 1_000_000) {
+  if (count < 1_000_000)
     return `${(count / 1000).toFixed(count % 1000 === 0 ? 0 : 1)}K`;
-  }
-
-  if (count < 1_000_000_000) {
+  if (count < 1_000_000_000)
     return `${(count / 1_000_000).toFixed(count % 1_000_000 === 0 ? 0 : 1)}M`;
-  }
-
-  return `${(count / 1_000_000_000).toFixed(
-    count % 1_000_000_000 === 0 ? 0 : 1,
-  )}B`;
+  return `${(count / 1_000_000_000).toFixed(count % 1_000_000_000 === 0 ? 0 : 1)}B`;
 }
 
 export default function page() {
@@ -76,18 +75,19 @@ export default function page() {
   if (!videoId) {
     router.push("/");
   }
+  const isMobile = useMediaQuery("(max-width:500px)");
 
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<video>();
   const [videoData, setVideoData] = useState<any[]>();
   const [error, setError] = useState<string>("");
   const [expanded, setExpanded] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(!isMobile); // toggle for small screen
   const isLong = (data?.description ?? "").length > 200;
 
   const fetchApi = async () => {
     setLoading(true);
     setError("");
-
     try {
       const response = await apiRequest(
         "GET",
@@ -116,10 +116,7 @@ export default function page() {
         (prev) =>
           prev && {
             ...prev,
-            owner: {
-              ...prev.owner,
-              isSubscribed: !prev.owner.isSubscribed,
-            },
+            owner: { ...prev.owner, isSubscribed: !prev.owner.isSubscribed },
           },
       );
     }
@@ -128,7 +125,6 @@ export default function page() {
   const fetchApiVideos = async () => {
     setLoading(true);
     setError("");
-
     try {
       const response = await apiRequest(
         "GET",
@@ -137,9 +133,6 @@ export default function page() {
         router,
       );
       setVideoData(
-        response.data.videos.filter((video: any) => video._id !== videoId),
-      );
-      console.log(
         response.data.videos.filter((video: any) => video._id !== videoId),
       );
     } catch (error: any) {
@@ -158,30 +151,24 @@ export default function page() {
     );
 
     if (res?.success) {
-      setData(
-        (prev) =>
-          prev && {
-            ...prev,
-            isLiked: !prev.isLiked,
-          },
-      );
+      setData((prev) => prev && { ...prev, isLiked: !prev.isLiked });
     }
   }
 
   useEffect(() => {
     fetchApi();
     fetchApiVideos();
-    console.log(videoData);
   }, [videoId]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
+
   return (
     <Grid container spacing={2}>
-      <Grid size={8}>
-        {/* Video Card */}
+      {/* Video + Description + Comments */}
+      <Grid size={{ xs: 12, md: 8 }}>
         <Card
-          variant="outlined" // removes default Paper elevation
+          variant="outlined"
           sx={{
             backgroundColor: "transparent",
             boxShadow: "none",
@@ -195,24 +182,14 @@ export default function page() {
               aspectRatio: "16 / 9",
               backgroundColor: "#000",
               overflow: "hidden",
-
-              "& .plyr": {
-                height: "100%",
-              },
-              "& video": {
-                objectFit: "cover",
-              },
+              "& .plyr": { height: "100%" },
+              "& video": { objectFit: "cover" },
             }}
           >
             <Plyr
               source={{
                 type: "video",
-                sources: [
-                  {
-                    src: data?.videoFile || "",
-                    type: "video/mp4",
-                  },
-                ],
+                sources: [{ src: data?.videoFile || "", type: "video/mp4" }],
                 poster: data?.thumbnail || "",
               }}
               options={{
@@ -228,20 +205,13 @@ export default function page() {
                   "rewind",
                   "fast-forward",
                 ],
-                keyboard: { focused: true, global: true }, // ✅ enables space, arrow keys
+                keyboard: { focused: true, global: true },
               }}
             />
           </Box>
 
           <CardContent
-            sx={{
-              padding: 0, // Remove padding
-              pb: 0,
-              pt: "10px",
-              boxShadow: "none", // Remove shadow
-              border: "none", // Remove border
-              "&:last-child": { pb: 0 },
-            }}
+            sx={{ padding: 0, pb: 0, pt: "10px", "&:last-child": { pb: 0 } }}
           >
             <Typography
               variant="h6"
@@ -249,8 +219,9 @@ export default function page() {
             >
               {data?.title}
             </Typography>
-            <Box className="flex  justify-between ">
-              <Box className="flex gap-2 pb-0">
+
+            <Box className="flex flex-col md:flex-row justify-between gap-2">
+              <Box className="flex gap-2 items-center">
                 <Link
                   className="flex gap-3 cursor-pointer"
                   href={`/profile?username=${data?.owner.username}`}
@@ -268,50 +239,37 @@ export default function page() {
                     </Typography>
                     <Typography
                       sx={{ fontSize: "13px" }}
-                      className=" text-gray-400"
+                      className="text-gray-400"
                     >
                       {formatSubscribers(data?.owner.subscribersCount || 0)}{" "}
                       subscribers
                     </Typography>
                   </Box>
                 </Link>
-                <Box className="ml-4">
-                  {data?.owner.isSubscribed ? (
-                    <Button
-                      onClick={toggleSubscribe}
-                      variant="contained"
-                      sx={{
-                        borderRadius: "100px",
-                        background: "white",
-                        color: "gray",
-                        boxShadow: "none",
-                      }}
-                    >
-                      Unsubscribe
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      onClick={toggleSubscribe}
-                      sx={{ borderRadius: "100px", boxShadow: "none" }}
-                    >
-                      Subscribe
-                    </Button>
-                  )}
+                <Box className="ml-0 md:ml-4">
+                  <Button
+                    onClick={toggleSubscribe}
+                    variant="contained"
+                    sx={{
+                      borderRadius: "100px",
+                      boxShadow: "none",
+                      background: data?.owner.isSubscribed
+                        ? "white"
+                        : undefined,
+                      color: data?.owner.isSubscribed ? "gray" : undefined,
+                    }}
+                  >
+                    {data?.owner.isSubscribed ? "Unsubscribe" : "Subscribe"}
+                  </Button>
                 </Box>
               </Box>
-              <Box className="flex gap-2 pb-0">
+
+              <Box className="flex gap-2">
                 <Box className="flex gap-2 h-fit bg-white rounded-full py-2 px-4">
-                  <span className="flex gap-2 ">
-                    <Button onClick={toggleLike} sx={{ padding: 0, margin: 0 }}>
-                      {data?.isLiked ? (
-                        <ThumbUpIcon />
-                      ) : (
-                        <ThumbUpOutlinedIcon />
-                      )}
-                    </Button>
-                    {formatSubscribers(data?.likesCount || 0)}
-                  </span>
+                  <Button onClick={toggleLike} sx={{ padding: 0, margin: 0 }}>
+                    {data?.isLiked ? <ThumbUpIcon /> : <ThumbUpOutlinedIcon />}
+                  </Button>
+                  <span>{formatSubscribers(data?.likesCount || 0)}</span>
                   <span className="border-l"></span>
                   <Button sx={{ padding: 0, margin: 0 }}>
                     <ThumbDownOffAltOutlinedIcon />
@@ -321,14 +279,14 @@ export default function page() {
             </Box>
           </CardContent>
         </Card>
-        {/* Description Card */}
+
+        {/* Description */}
         <Box
           sx={{
             background: "white",
             borderRadius: "10px",
             marginTop: "20px",
             padding: "10px",
-            minHeight: "100px",
           }}
         >
           <p className="font-bold text-[14px]">
@@ -352,25 +310,58 @@ export default function page() {
             </Button>
           )}
         </Box>
-        {/* Comment Box */}
-        <Box>
-          <CommentSection videoId={videoId || ""} />
+
+        {/* Comment Section with collapse on small screen */}
+        <Box sx={{ marginTop: "20px" }}>
+          <Box className="flex justify-between md:hidden items-center mb-1">
+            <Typography variant="subtitle1">Comments</Typography>
+            <IconButton
+              size="small"
+              onClick={() => setCommentsOpen(!commentsOpen)}
+            >
+              {commentsOpen ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+            </IconButton>
+          </Box>
+
+          <Collapse
+            in={commentsOpen}
+            orientation="vertical"
+            timeout={300}
+            sx={{ width: "100%" }}
+          >
+            <CommentSection videoId={videoId || ""} />
+          </Collapse>
         </Box>
       </Grid>
-      <Grid size={4}>
-        {(videoData?.length ?? 0) > 0 ? (
-          videoData?.map((item: any) => (
-            <VideoCardHoriontal
-              key={item._id}
-              id={item._id}
-              thumbnail={item.thumbnail}
-              avatar={item.owner.avatar}
-              fullName={item.owner.fullName}
-              views={item.views}
-              createdAt={item.createdAt}
-              title={item.title}
-            />
-          ))
+
+      {/* Related Videos */}
+      <Grid size={{ xs: 12, md: 4 }}>
+        {videoData?.length ? (
+          videoData.map((item: any) =>
+            isMobile ? (
+              <VideoCard
+                key={item._id}
+                id={item._id}
+                thumbnail={item.thumbnail}
+                title={item.title}
+                views={item.views}
+                createdAt={item.createdAt}
+                avatar={item.owner.avatar}
+                fullName={item.owner.fullName}
+              />
+            ) : (
+              <VideoCardHoriontal
+                key={item._id}
+                id={item._id}
+                thumbnail={item.thumbnail}
+                avatar={item.owner.avatar}
+                fullName={item.owner.fullName}
+                views={item.views}
+                createdAt={item.createdAt}
+                title={item.title}
+              />
+            ),
+          )
         ) : (
           <div className="font-semibold text-[16px] text-center mt-5">
             No Related Videos

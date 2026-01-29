@@ -41,7 +41,7 @@ export default function VideoCardHoriontal({
           className="cardMedia"
           sx={{
             borderRadius: "8px",
-            height: "125px",
+            height: "100px",
             width: "auto",
           }}
           component="img"
