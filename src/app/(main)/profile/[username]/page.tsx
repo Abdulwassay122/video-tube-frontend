@@ -62,7 +62,7 @@ export default function page({
     try {
       const res = await apiRequest(
         "GET",
-        `${apiUrl}/api/v1/users/profile/${encodeURIComponent(username)}/${
+        `${apiUrl}/api/v1/users/profile/${username}/${
           user === null ? "auth" : ""
         }`,
         {},
