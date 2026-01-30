@@ -17,6 +17,7 @@ import Spinner from "./assets/Iphone-spinner-2.gif";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import { apiRequest } from "@/utils/apiRequest";
+import { useRouter } from "next/navigation";
 
 type FormData = {
   fullName: string;
@@ -27,9 +28,11 @@ type FormData = {
   avatar: File | null;
   coverImage?: File | null;
 };
-
+const CLOUD_NAME = "dogzyov9k";
+const UPLOAD_PRESET = "video_upload";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 export default function Register() {
+  const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<String>("");
 
@@ -48,24 +51,32 @@ export default function Register() {
   const avatarInputRef = useRef<HTMLInputElement | null>(null);
   const coverInputRef = useRef<HTMLInputElement | null>(null);
 
+  async function uploadToCloudinary(file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", UPLOAD_PRESET);
+
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
+
+    if (!res.ok) {
+      throw new Error("Image upload failed");
+    }
+
+    return res.json(); // contains secure_url
+  }
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-  };
-
-  const handleFileChange = (
-    e: ChangeEvent<HTMLInputElement>,
-    field: "avatar" | "coverImage",
-  ) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: e.target.files![0],
-      }));
-    }
   };
 
   // for validation
@@ -117,27 +128,47 @@ export default function Register() {
     }
 
     try {
-      const form = new FormData();
-      form.append("fullName", formData.fullName);
-      form.append("email", formData.email);
-      form.append("username", formData.username);
-      form.append("password", formData.password);
+      // 🔥 Upload avatar first
+      const avatarUpload = await uploadToCloudinary(formData.avatar!);
 
-      if (formData.avatar) form.append("avatar", formData.avatar);
-      if (formData.coverImage) form.append("coverImage", formData.coverImage);
+      // 🔥 Upload cover image if exists
+      let coverImageUrl = "";
+      if (formData.coverImage) {
+        const coverUpload = await uploadToCloudinary(formData.coverImage);
+        coverImageUrl = coverUpload.secure_url;
+      }
 
-      // Using apiRequest with isFormData = true
+      // ✅ Send ONLY URLs to backend
+      const payload = {
+        fullName: formData.fullName,
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+        avatar: avatarUpload.secure_url,
+        coverImage: coverImageUrl,
+      };
+      console.log(payload);
+
       const res = await apiRequest(
         "POST",
         `${apiUrl}/api/v1/users/register`,
-        form,
+        payload,
       );
 
       toast.success(res.message);
+      router.push("/user-login");
+      setFormData({
+        fullName: "",
+        email: "",
+        username: "",
+        password: "",
+        confirmPassword: "",
+        avatar: null,
+        coverImage: null,
+      });
       console.log("User:", res.data);
     } catch (error: any) {
-      // ERROR → EXACT backend message
-      toast.error(error.message);
+      toast.error(error.message || "Registration failed");
       setError(error.message);
     } finally {
       setLoading(false);
@@ -491,6 +522,7 @@ export default function Register() {
             fullWidth
             sx={{ mt: 2, py: 1.2 }}
             onClick={submitForm}
+            disabled={loading}
           >
             Register
           </Button>
