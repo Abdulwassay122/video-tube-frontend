@@ -39,9 +39,9 @@ export interface ProfileData {
   isSubscribed: boolean;
   videos: Video[];
 }
+const searchParams = useSearchParams();
 
 export default function page() {
-  const searchParams = useSearchParams();
   const router = useRouter();
   const username = searchParams.get("username");
   const { user } = useUser();
