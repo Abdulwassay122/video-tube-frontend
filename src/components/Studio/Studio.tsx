@@ -1,6 +1,6 @@
 "use client";
-import { ProfileData } from "@/app/(main)/profile/page";
-import { formatSubscribers } from "@/app/(main)/watch/page";
+import { ProfileData } from "@/app/(main)/profile/[username]/page";
+import { formatSubscribers } from "@/app/(main)/watch/[videoId]/page";
 import { useUser } from "@/app/context/UserContext";
 import { apiRequest } from "@/utils/apiRequest";
 import { Avatar, Box, Button, List, Modal, Typography } from "@mui/material";

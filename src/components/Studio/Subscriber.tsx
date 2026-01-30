@@ -51,7 +51,7 @@ export default function Subscriber() {
             key={ele._id}
             className="flex items-center gap-3 p-3 bg-white rounded-xl shadow hover:shadow-lg transition-shadow duration-200"
           >
-            <Link href={`/profile?username=${encodeURIComponent(ele.subscriber.username)}`}>
+            <Link href={`/profile/${encodeURIComponent(ele.subscriber.username)}`}>
               <Image
                 className="h-16 w-16 rounded-full object-cover"
                 alt={ele.subscriber.username || ""}
@@ -61,7 +61,7 @@ export default function Subscriber() {
               />
             </Link>
             <Box>
-              <Link href={`/profile?username=${encodeURIComponent(ele.subscriber.username)}`}>
+              <Link href={`/profile/${encodeURIComponent(ele.subscriber.username)}`}>
                 <Typography className="text-lg font-semibold hover:text-[#1976d2] transition-colors duration-200">
                   {ele.subscriber.fullName.slice(0, 100)}
                 </Typography>

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { Box, CircularProgress, Grid } from "@mui/material";
 import { apiRequest } from "@/utils/apiRequest";
@@ -7,7 +7,11 @@ import { useRouter, useSearchParams } from "next/navigation";
 import VideoCard from "@/components/VideoCard";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-export default function page() {
+export default function page({
+  params,
+}: {
+  params: Promise<{ search: string }>;
+}) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const router = useRouter();
 
@@ -17,18 +21,17 @@ export default function page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const params = useSearchParams();
+  const { search } = React.use(params);
 
-  const query = params.get("search");
-  console.log("qq", query);
+  console.log("qq", search);
 
   const fetchVideos = async (pageNumber = 1) => {
-    if (!query) return;
+    if (!search) return;
 
     try {
       const res = await apiRequest(
         "GET",
-        `${apiUrl}/api/v1/videos?query=${query}&page=${pageNumber}&limit=10`,
+        `${apiUrl}/api/v1/videos?query=${search}&page=${pageNumber}&limit=10`,
         {},
         router,
       );
@@ -47,9 +50,8 @@ export default function page() {
   };
 
   useEffect(() => {
-    if (!query) router.push("/");
     fetchVideos(1);
-  }, [query]);
+  }, [search]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;

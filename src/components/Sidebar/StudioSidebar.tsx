@@ -367,7 +367,7 @@ export default function StudioSidebar({
                   <MenuItem
                     onClick={() =>
                       router.push(
-                        `/profile?username=${encodeURIComponent(user?.username || "")}`,
+                        `/profile/${encodeURIComponent(user?.username || "")}`,
                       )
                     }
                   >

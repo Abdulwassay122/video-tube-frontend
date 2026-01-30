@@ -257,7 +257,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     const timer = setTimeout(() => {
       if (search.trim().length > 0) {
-        router.push(`/search?search=${encodeURIComponent(search)}`);
+        router.push(`/search/${encodeURIComponent(search)}`);
       } else {
         router.push(`/`);
       }
@@ -373,7 +373,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                 <MenuItem
                   onClick={() =>
                     router.push(
-                      `/profile?username=${encodeURIComponent(user?.username || "")}`,
+                      `/profile/${encodeURIComponent(user?.username || "")}`,
                     )
                   }
                 >

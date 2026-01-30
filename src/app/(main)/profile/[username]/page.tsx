@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Box, Button, Typography, Avatar, Grid } from "@mui/material";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import VideoCard from "@/components/VideoCard";
 import { apiRequest } from "@/utils/apiRequest";
@@ -40,11 +40,14 @@ export interface ProfileData {
   videos: Video[];
 }
 
-export default function page() {
+export default function page({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  const username = searchParams.get("username");
+  const { username } = React.use(params);
   const { user } = useUser();
 
   const [data, setData] = useState<ProfileData | null>(null);
@@ -77,6 +80,7 @@ export default function page() {
   };
 
   useEffect(() => {
+    console.log(username);
     fetchProfile();
   }, [username]);
 

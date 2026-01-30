@@ -224,7 +224,7 @@ export default function StVideoCard() {
         {data?.data.videos.map((item: any, i: number) => (
           <Grid size={{ md: 4, sm: 6, xs: 12 }} key={i}>
             <Card
-              onClick={() => router.push(`/watch?v=${item._id}`)}
+              onClick={() => router.push(`/watch/${item._id}`)}
               sx={{
                 borderRadius: "10px",
                 boxShadow: "none",

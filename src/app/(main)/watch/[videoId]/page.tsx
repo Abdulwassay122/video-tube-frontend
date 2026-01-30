@@ -1,5 +1,5 @@
 "use client";
-
+import React from "react";
 import { apiRequest } from "@/utils/apiRequest";
 import {
   Box,
@@ -65,16 +65,17 @@ export function formatSubscribers(count: number): string {
   return `${(count / 1_000_000_000).toFixed(count % 1_000_000_000 === 0 ? 0 : 1)}B`;
 }
 
-export default function page() {
+export default function page({
+  params,
+}: {
+  params: Promise<{ videoId: string }>;
+}) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  const params = useSearchParams();
   const router = useRouter();
   const { user } = useUser();
 
-  const videoId = params.get("v");
-  if (!videoId) {
-    router.push("/");
-  }
+  const { videoId } = React.use(params);
+
   const isMobile = useMediaQuery("(max-width:500px)");
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -224,7 +225,7 @@ export default function page() {
               <Box className="flex gap-2 items-center">
                 <Link
                   className="flex gap-3 cursor-pointer"
-                  href={`/profile?username=${data?.owner.username}`}
+                  href={`/profile/${encodeURIComponent(data?.owner.username || "")}`}
                 >
                   <Image
                     className="h-10 w-10 rounded-full"

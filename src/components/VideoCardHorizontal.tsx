@@ -23,7 +23,7 @@ export default function VideoCardHoriontal({
   createdAt,
 }: Props) {
   return (
-    <Link href={`/watch?v=${id}`}>
+    <Link href={`/watch/${id}`}>
       <Card
         sx={{
           borderRadius: "10px",
