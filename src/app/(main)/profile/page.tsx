@@ -39,10 +39,11 @@ export interface ProfileData {
   isSubscribed: boolean;
   videos: Video[];
 }
-const searchParams = useSearchParams();
 
 export default function page() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const username = searchParams.get("username");
   const { user } = useUser();
 
