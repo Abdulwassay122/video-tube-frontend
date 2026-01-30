@@ -203,7 +203,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const theme = useTheme();
-  const { user } = useUser();
+  const { user, setUser } = useUser();
 
   const [open, setOpen] = React.useState(false);
 
@@ -239,10 +239,9 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
         router,
       );
 
-      // SUCCESS: backend message and data exactly
+      console.log(data);
       toast.success(data.message);
-      router.refresh();
-      console.log("User:", data.data);
+      setUser(null);
     } catch (error: any) {
       // ERROR: backend message exactly
       const message = error?.message || "Something went wrong";
@@ -272,20 +271,22 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          {!isMobile && <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={[
-              {
-                marginRight: 5,
-              },
-              open && { display: "none" },
-            ]}
-          >
-            <MenuIcon />
-          </IconButton>}
+          {!isMobile && (
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={[
+                {
+                  marginRight: 5,
+                },
+                open && { display: "none" },
+              ]}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
 
           {/* Logo */}
           <Link href="/">
@@ -372,7 +373,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
                 <MenuItem
                   onClick={() =>
                     router.push(
-                      `/profile?username=${encodeURIComponent(user?.username)}`,
+                      `/profile?username=${encodeURIComponent(user?.username || "")}`,
                     )
                   }
                 >

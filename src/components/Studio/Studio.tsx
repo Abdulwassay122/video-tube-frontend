@@ -39,6 +39,7 @@ export default function Studio() {
         router,
       );
 
+      console.log(res)
       if (res?.success) {
         setData(res.data);
       }

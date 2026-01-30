@@ -265,20 +265,22 @@ export default function StudioSidebar({
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar>
-          {!isMobile&&<IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={[
-              {
-                marginRight: 5,
-              },
-              open && { display: "none" },
-            ]}
-          >
-            <MenuIcon />
-          </IconButton>}
+          {!isMobile && (
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              onClick={handleDrawerOpen}
+              edge="start"
+              sx={[
+                {
+                  marginRight: 5,
+                },
+                open && { display: "none" },
+              ]}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
           <Box className="flex justify-between w-full items-center">
             {/* Logo */}
             <Link href="/studio">
@@ -365,7 +367,7 @@ export default function StudioSidebar({
                   <MenuItem
                     onClick={() =>
                       router.push(
-                        `/profile?username=${encodeURIComponent(user?.username)}`,
+                        `/profile?username=${encodeURIComponent(user?.username || "")}`,
                       )
                     }
                   >
@@ -383,12 +385,12 @@ export default function StudioSidebar({
                     </ListItemIcon>
                     Add another account
                   </MenuItem>
-                  <MenuItem onClick={handleClose}>
+                  {/* <MenuItem onClick={handleClose}>
                     <ListItemIcon>
                       <Settings fontSize="small" />
                     </ListItemIcon>
                     Settings
-                  </MenuItem>
+                  </MenuItem> */}
                   <MenuItem onClick={handleLogout}>
                     <ListItemIcon>
                       <Logout fontSize="small" />

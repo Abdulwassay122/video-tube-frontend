@@ -6,10 +6,12 @@ import { apiRequest } from "@/utils/apiRequest";
 import { useRouter } from "next/navigation";
 import VideoCard from "./VideoCard";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { useUser } from "@/app/context/UserContext";
 
 export default function page() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
   const router = useRouter();
+  const { user } = useUser();
 
   const [data, setData] = useState<any[]>([]);
   const [page, setPage] = useState(1);
@@ -40,6 +42,9 @@ export default function page() {
 
   useEffect(() => {
     fetchVideos(1);
+    setTimeout(() => {
+      console.log("User", user);
+    }, 5000);
   }, []);
 
   if (loading) return <div>Loading...</div>;

@@ -84,7 +84,9 @@ export default function UserHistory() {
       {/* User Info */}
       <Box
         className="flex flex-col sm:flex-row sm:text-left text-center items-center gap-4 mb-6 cursor-pointer"
-        onClick={() => router.push(`/profile?username=${userData?.username}`)}
+        onClick={() =>
+          router.push(`/profile?username=${encodeURIComponent(user.username)}`)
+        }
       >
         <Avatar src={userData?.avatar} sx={{ width: 120, height: 120 }} />
         <Box>

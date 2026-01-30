@@ -28,7 +28,7 @@ async function getCurrentUser() {
   const cookie = (await headers()).get("cookie");
 
   try {
-    const res = await fetch("http://localhost:8000/api/v1/users/me", {
+    const res = await fetch(`${apiUrl}/api/v1/users/me`, {
       headers: {
         cookie: cookie ?? "",
       },
@@ -47,13 +47,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await getCurrentUser();
+  // const user = await getCurrentUser();
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <UserProvider user={user}>
+        <UserProvider >
           <StudioSidebar>
             <MuiThemeProvider>
               <ToastProvider />

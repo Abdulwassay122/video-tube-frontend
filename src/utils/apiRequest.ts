@@ -5,7 +5,7 @@ export async function apiRequest<T = any>(
   method: Method,
   url: string,
   body: any = {},
-  router?: any
+  router?: any,
 ): Promise<T> {
   try {
     const { data } = await axios({
@@ -35,23 +35,24 @@ export async function apiRequest<T = any>(
   }
 }
 
-export async function refreshToken<T = any>(router: any) {
+export async function refreshToken(): Promise<boolean> {
   try {
-    const { data } = await axios({
-      method: "POST",
-      url: `${apiUrl}/api/v1/users/refresh-token`,
-      withCredentials: true,
-      headers: { "Content-Type": "application/json" },
-    });
+    await axios.post(
+      `${apiUrl}/api/v1/users/refresh-token`,
+      {},
+      {
+        withCredentials: true,
+      },
+    );
 
-    if (data.status === 401) {
-      router.push("/user-login");
-    }
+    return true;
   } catch (err) {
-    const error = err as AxiosError<any>;
+    const error = err as AxiosError;
 
-    if (error?.status === 401) {
-      router.push("/user-login");
+    if (error.response?.status === 401) {
+      return false;
     }
+
+    return false;
   }
 }

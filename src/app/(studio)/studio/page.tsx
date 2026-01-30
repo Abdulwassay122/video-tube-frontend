@@ -5,5 +5,8 @@ import Studio from "@/components/Studio/Studio";
 
 export default function page() {
   const { user } = useUser();
-  return <>{user !== null ? <Studio /> : <NotAuthenticated />}</>;
+  if (user === null) return <NotAuthenticated />;
+  if (user === undefined) return null;
+
+  return <Studio />;
 }
