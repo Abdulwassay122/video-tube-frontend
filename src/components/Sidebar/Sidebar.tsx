@@ -207,7 +207,7 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 
   const [open, setOpen] = React.useState(false);
 
-  const [search, setSearch] = React.useState<string>("");
+  const [search, setSearch] = React.useState<string | undefined>(undefined);
 
   const isMobile = useMediaQuery("(max-width:500px)");
 
@@ -256,10 +256,15 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
+      if (search === undefined) return;
       if (search.trim().length > 0) {
         router.push(`/search/${encodeURIComponent(search)}`);
-      } else {
+      } else if (search.trim().length === 0) {
         router.push(`/`);
+        setSearch(undefined);
+        console.log(
+          "eleleleleleleleelelelelelelleeleeeeeeeeeeeeeeeelllllllllllllllllllllllelelel",
+        );
       }
     }, 500);
 

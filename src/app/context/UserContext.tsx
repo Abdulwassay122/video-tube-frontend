@@ -55,7 +55,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           await fetchMe();
         } else {
           setUser(null);
-          router.push("/user-login");
         }
       } else {
         setUser(null);
