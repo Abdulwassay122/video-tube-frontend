@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useRef } from "react";
 import { apiRequest } from "@/utils/apiRequest";
 import {
   Box,
@@ -85,6 +85,37 @@ export default function page({
   const [expanded, setExpanded] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(!isMobile); // toggle for small screen
   const isLong = (data?.description ?? "").length > 200;
+  const playerRef = useRef<any>(null);
+
+  useEffect(() => {
+    const player = playerRef.current?.plyr;
+    if (!player) return;
+    const orientation = screen.orientation as any;
+
+    const handleEnterFullscreen = async () => {
+      if (window.innerWidth <= 768 && orientation?.lock) {
+        try {
+          await orientation.lock("landscape");
+        } catch (err) {
+          console.warn("Orientation lock failed");
+        }
+      }
+    };
+
+    const handleExitFullscreen = async () => {
+      if (screen.orientation?.unlock) {
+        screen.orientation.unlock();
+      }
+    };
+
+    player.on("enterfullscreen", handleEnterFullscreen);
+    player.on("exitfullscreen", handleExitFullscreen);
+
+    return () => {
+      player.off("enterfullscreen", handleEnterFullscreen);
+      player.off("exitfullscreen", handleExitFullscreen);
+    };
+  }, []);
 
   const fetchApi = async () => {
     setLoading(true);
@@ -179,12 +210,22 @@ export default function page({
         >
           <Box
             sx={{
+              position: "relative",
               width: "100%",
-              aspectRatio: "16 / 9",
+              paddingTop: "56.25%", // 16:9
               backgroundColor: "#000",
-              overflow: "hidden",
-              "& .plyr": { height: "100%" },
-              "& video": { objectFit: "cover" },
+              "& .plyr": {
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+              },
+              "& video": {
+                width: "100%",
+                height: "100%",
+                objectFit: "contain", // IMPORTANT for mobile
+              },
             }}
           >
             <Plyr
@@ -200,7 +241,7 @@ export default function page({
                   "progress",
                   "current-time",
                   "mute",
-                  "volume",
+                  isMobile ? "" : "volume",
                   "settings",
                   "fullscreen",
                   "rewind",
