@@ -12,7 +12,7 @@ import {
   IconButton,
   useMediaQuery,
 } from "@mui/material";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Plyr } from "plyr-react";
 import "plyr-react/plyr.css";
@@ -76,7 +76,11 @@ export default function page({
 
   const { videoId } = React.use(params);
 
-  const isMobile = useMediaQuery("(max-width:500px)");
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 500);
+  }, []);
 
   const [loading, setLoading] = useState<boolean>(true);
   const [data, setData] = useState<video>();
@@ -86,34 +90,38 @@ export default function page({
   const [commentsOpen, setCommentsOpen] = useState(!isMobile); // toggle for small screen
   const isLong = (data?.description ?? "").length > 200;
   const playerRef = useRef<any>(null);
-
+  const lastTimeRef = useRef(0);
+  const wasPlayingRef = useRef(false);
+  
   useEffect(() => {
     const player = playerRef.current?.plyr;
     if (!player) return;
-    const orientation = screen.orientation as any;
 
-    const handleEnterFullscreen = async () => {
-      if (window.innerWidth <= 768 && orientation?.lock) {
+    const saveState = () => {
+      lastTimeRef.current = player.currentTime;
+      wasPlayingRef.current = !player.paused;
+    };
+
+    const restoreState = async () => {
+      if (!player) return;
+      player.currentTime = lastTimeRef.current;
+
+      if (wasPlayingRef.current) {
         try {
-          await orientation.lock("landscape");
-        } catch (err) {
-          console.warn("Orientation lock failed");
-        }
+          await player.play();
+        } catch {}
       }
     };
 
-    const handleExitFullscreen = async () => {
-      if (screen.orientation?.unlock) {
-        screen.orientation.unlock();
-      }
-    };
+    player.on("enterfullscreen", saveState);
+    player.on("exitfullscreen", saveState);
 
-    player.on("enterfullscreen", handleEnterFullscreen);
-    player.on("exitfullscreen", handleExitFullscreen);
+    window.addEventListener("orientationchange", restoreState);
 
     return () => {
-      player.off("enterfullscreen", handleEnterFullscreen);
-      player.off("exitfullscreen", handleExitFullscreen);
+      player.off("enterfullscreen", saveState);
+      player.off("exitfullscreen", saveState);
+      window.removeEventListener("orientationchange", restoreState);
     };
   }, []);
 
