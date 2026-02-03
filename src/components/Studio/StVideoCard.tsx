@@ -20,6 +20,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { toast } from "react-toastify";
 import CloseIcon from "@mui/icons-material/Close";
+import VideoGridSkeleton from "../skeletonLoaders/VideoGridSkeleton";
 
 export default function StVideoCard() {
   const router = useRouter();
@@ -214,8 +215,9 @@ export default function StVideoCard() {
     fetchApi();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (data?.data.videos.length === 0) return <div className="mt-4 text-gray-500">No videos uploaded</div>;
+  if (loading) return <div className="mt-4"><VideoGridSkeleton /></div>;
+  if (data?.data.videos.length === 0)
+    return <div className="mt-4 text-gray-500">No videos uploaded</div>;
   if (error) return <div>Error: {error}</div>;
 
   return (

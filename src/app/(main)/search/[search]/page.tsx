@@ -1,11 +1,13 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 
-import { Box, CircularProgress, Grid } from "@mui/material";
+import { Box, CircularProgress, Grid, Typography } from "@mui/material";
 import { apiRequest } from "@/utils/apiRequest";
 import { useRouter, useSearchParams } from "next/navigation";
 import VideoCard from "@/components/VideoCard";
 import InfiniteScroll from "react-infinite-scroll-component";
+import VideoGridSkeleton from "@/components/skeletonLoaders/VideoGridSkeleton";
+import VideoLibraryOutlinedIcon from "@mui/icons-material/VideoLibraryOutlined";
 
 export default function page({
   params,
@@ -53,9 +55,34 @@ export default function page({
     fetchVideos(1);
   }, [search]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <>
+        <VideoGridSkeleton />
+      </>
+    );
   if (error) return <div>Error: {error}</div>;
-  if (data.length === 0) return <div>No Videos Found</div>;
+  if (data.length === 0)
+    return (
+      <Box
+        sx={{
+          textAlign: "center",
+          py: 6,
+          color: "#646664",
+        }}
+      >
+        <VideoLibraryOutlinedIcon
+          sx={{
+            fontSize: 56,
+            color: "#646664",
+            mb: 1,
+          }}
+        />
+        <Typography variant="h6" sx={{ fontWeight: 600, color: "#646664" }}>
+          No videos yet
+        </Typography>
+      </Box>
+    );
 
   return (
     <>

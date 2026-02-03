@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import VideoCard from "./VideoCard";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useUser } from "@/app/context/UserContext";
+import VideoGridSkeleton from "./skeletonLoaders/VideoGridSkeleton";
 
 export default function page() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -47,7 +48,12 @@ export default function page() {
     }, 5000);
   }, []);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <>
+        <VideoGridSkeleton />
+      </>
+    );
   if (error) return <div>Error: {error}</div>;
   if (data.length === 0) return <div>No Videos Found</div>;
 
@@ -58,9 +64,9 @@ export default function page() {
         next={() => fetchVideos(page + 1)}
         hasMore={page < totalPages}
         loader={
-          <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
-            <CircularProgress />
-          </Box>
+          <>
+            <VideoGridSkeleton />
+          </>
         }
       >
         {" "}

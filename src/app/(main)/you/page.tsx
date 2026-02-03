@@ -8,6 +8,7 @@ import { useUser } from "@/app/context/UserContext";
 import NotAuthenticated from "@/components/NotAuthenticated";
 import VideoCard from "@/components/VideoCard";
 import { apiRequest } from "@/utils/apiRequest";
+import UserHistorySkeleton from "@/components/skeletonLoaders/UserHistorySkeleton";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -43,41 +44,36 @@ export default function UserHistory() {
 
   const [userData, setUserData] = useState<UserDetail | null>(null);
   const [history, setHistory] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchUserDetail = async () => {
-    setLoading(true);
     try {
       const res = await apiRequest("GET", `${apiUrl}/api/v1/users/user-detail`);
       if (res?.success) setUserData(res.data);
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
   const getWatchHistory = async () => {
-    setLoading(true);
     try {
       const res = await apiRequest("GET", `${apiUrl}/api/v1/users/history`);
       if (res?.success) setHistory(res.data);
       console.log(history);
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
     if (user) fetchUserDetail();
     if (user) getWatchHistory();
+    setLoading(false)
   }, [user]);
 
-  if (!user)
+  if (user === null)
     return <NotAuthenticated message="Login to see your watch history." />;
 
-  if (loading) return "Loading...";
+  if (loading || user === undefined) return <UserHistorySkeleton />;
 
   return (
     <Box className="sm:px-4 mt-6">

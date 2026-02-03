@@ -241,7 +241,7 @@ export default function VideoUpload() {
         height: "100%",
       }}
     >
-      <Paper elevation={3} sx={{ p: 4, textAlign: "center", width: "100%" }}>
+      <Paper elevation={2} sx={{ p: 4, textAlign: "center", width: "100%", borderRadius:"15px" }}>
         <CloudUploadIcon sx={{ fontSize: 48, color: "primary.main", mb: 1 }} />
         <Typography variant="h6" fontWeight={600}>
           Upload your video

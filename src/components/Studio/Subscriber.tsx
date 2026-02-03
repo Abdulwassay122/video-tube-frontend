@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { BoxSkeleton } from "../skeletonLoaders/StudioSkeleton";
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function Subscriber() {
@@ -42,7 +43,7 @@ export default function Subscriber() {
     fetchSubs();
   }, []);
 
-  if (loading) return "Loading...";
+  if (loading) return <BoxSkeleton/>;
   return (
     <List className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {subscribers.length > 0 ? (

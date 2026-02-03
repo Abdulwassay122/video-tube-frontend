@@ -1,12 +1,13 @@
 "use client";
 import { useUser } from "@/app/context/UserContext";
 import NotAuthenticated from "@/components/NotAuthenticated";
+import StudioSkeleton from "@/components/skeletonLoaders/StudioSkeleton";
 import Studio from "@/components/Studio/Studio";
 
 export default function page() {
   const { user } = useUser();
   if (user === null) return <NotAuthenticated />;
-  if (user === undefined) return null;
+  if (user === undefined) return <StudioSkeleton />;
 
   return <Studio />;
 }

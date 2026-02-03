@@ -262,9 +262,6 @@ export default function Sidebar({ children }: { children: React.ReactNode }) {
       } else if (search.trim().length === 0) {
         router.push(`/`);
         setSearch(undefined);
-        console.log(
-          "eleleleleleleleelelelelelelleeleeeeeeeeeeeeeeeelllllllllllllllllllllllelelel",
-        );
       }
     }, 500);
 

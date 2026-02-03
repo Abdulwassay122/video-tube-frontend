@@ -22,7 +22,14 @@ export async function apiRequest<T = any>(
     const error = err as AxiosError<any>;
 
     if (error?.status === 401) {
-      router.push("/user-login");
+      const refreshed = await refreshToken();
+      console.log("refreshed from apiReq", refreshed);
+      if (refreshed) {
+        // retry /me after refresh
+        return await apiRequest(method, url, body, router);
+      } else {
+        router.push("/user-login");
+      }
     }
     // throw the backend error as-is, or fallback
     throw (

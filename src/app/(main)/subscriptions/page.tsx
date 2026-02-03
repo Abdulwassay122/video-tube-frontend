@@ -8,6 +8,7 @@ import { useUser } from "@/app/context/UserContext";
 import NotAuthenticated from "@/components/NotAuthenticated";
 import VideoCard from "@/components/VideoCard";
 import { apiRequest } from "@/utils/apiRequest";
+import VideoGridSkeleton from "@/components/skeletonLoaders/VideoGridSkeleton";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -72,10 +73,13 @@ export default function SubscribedVideos() {
   }, [user]);
 
   /* Not authenticated */
-  if (!user) {
+  if (user === null) {
     return (
       <NotAuthenticated message="Login to see videos from channels you subscribe to." />
     );
+  }
+  if (user === undefined) {
+    return <VideoGridSkeleton />;
   }
 
   return (
@@ -95,7 +99,7 @@ export default function SubscribedVideos() {
       {/* Videos */}
       <Grid container spacing={2}>
         {videos.map((video, i) => (
-          <Grid size={{ md: 4, sm: 6, xs: 12 }}  key={i}>
+          <Grid size={{ md: 4, sm: 6, xs: 12 }} key={i}>
             <VideoCard
               id={video._id}
               thumbnail={video.thumbnail}
@@ -111,9 +115,9 @@ export default function SubscribedVideos() {
 
       {/* Loading */}
       {loading && (
-        <Box className="flex justify-center mt-6">
-          <CircularProgress />
-        </Box>
+        <>
+          <VideoGridSkeleton />
+        </>
       )}
 
       {/* Load More */}

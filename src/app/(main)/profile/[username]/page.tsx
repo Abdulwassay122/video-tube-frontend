@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import VideoCard from "@/components/VideoCard";
 import { apiRequest } from "@/utils/apiRequest";
 import { useUser } from "@/app/context/UserContext";
+import VideoGridSkeleton from "@/components/skeletonLoaders/VideoGridSkeleton";
+import ProfileSkeleton from "@/components/skeletonLoaders/ProfileSkeleton";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -111,7 +113,7 @@ export default function page({
     }
   };
 
-  if (loading) return <Typography>Loading profile...</Typography>;
+  if (loading) return <ProfileSkeleton />;
   if (!data)
     return (
       <Typography className="text-center mt-10">Profile not found</Typography>

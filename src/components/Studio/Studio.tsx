@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import Subscriber from "./Subscriber";
 import Subscription from "./Subscriptions";
 import EditIcon from "@mui/icons-material/Edit";
+import StudioSkeleton from "../skeletonLoaders/StudioSkeleton";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -39,7 +40,7 @@ export default function Studio() {
         router,
       );
 
-      console.log(res)
+      console.log(res);
       if (res?.success) {
         setData(res.data);
       }
@@ -93,7 +94,7 @@ export default function Studio() {
     }
   };
 
-  if (loading) return <Typography>Loading channel...</Typography>;
+  if (loading) return <StudioSkeleton />;
   if (!data)
     return (
       <Typography className="text-center mt-10">Profile not found</Typography>
