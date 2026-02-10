@@ -28,6 +28,7 @@ import VideoCardHoriontal from "@/components/VideoCardHorizontal";
 import { useUser } from "@/app/context/UserContext";
 import Link from "next/link";
 import VideoCard from "@/components/VideoCard";
+import VideoPageSkeleton from "@/components/skeletonLoaders/VideoPageSkeleton";
 
 type video = {
   _id: string;
@@ -92,7 +93,7 @@ export default function page({
   const playerRef = useRef<any>(null);
   const lastTimeRef = useRef(0);
   const wasPlayingRef = useRef(false);
-  
+
   useEffect(() => {
     const player = playerRef.current?.plyr;
     if (!player) return;
@@ -131,7 +132,7 @@ export default function page({
     try {
       const response = await apiRequest(
         "GET",
-        `${apiUrl}/api/v1/videos/${videoId}/${user !== null ? "" : "unauth"}`,
+        `${apiUrl}/api/v1/videos/${videoId}/${user !== null && user !== undefined ? "" : "unauth"}`,
         {},
         router,
       );
@@ -196,11 +197,13 @@ export default function page({
   }
 
   useEffect(() => {
-    fetchApi();
-    fetchApiVideos();
-  }, [videoId]);
+    if (user !== undefined) {
+      fetchApi();
+      fetchApiVideos();
+    }
+  }, [videoId, user]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <VideoPageSkeleton />;
   if (error) return <div>Error: {error}</div>;
 
   return (
