@@ -78,6 +78,7 @@ export default function SubscribedVideos() {
       <NotAuthenticated message="Login to see videos from channels you subscribe to." />
     );
   }
+  
   if (user === undefined) {
     return <VideoGridSkeleton />;
   }

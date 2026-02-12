@@ -10,7 +10,6 @@ import {
   Typography,
   Collapse,
   IconButton,
-  useMediaQuery,
 } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -29,6 +28,8 @@ import { useUser } from "@/app/context/UserContext";
 import Link from "next/link";
 import VideoCard from "@/components/VideoCard";
 import VideoPageSkeleton from "@/components/skeletonLoaders/VideoPageSkeleton";
+import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
+import AddToPlaylistModal from "@/components/AddToPlaylistmodal";
 
 type video = {
   _id: string;
@@ -93,6 +94,9 @@ export default function page({
   const playerRef = useRef<any>(null);
   const lastTimeRef = useRef(0);
   const wasPlayingRef = useRef(false);
+
+  // modal
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   useEffect(() => {
     const player = playerRef.current?.plyr;
@@ -318,15 +322,47 @@ export default function page({
               </Box>
 
               <Box className="flex gap-2">
-                <Box className="flex gap-2 h-fit bg-white rounded-full py-2 px-4">
-                  <Button onClick={toggleLike} sx={{ padding: 0, margin: 0 }}>
-                    {data?.isLiked ? <ThumbUpIcon /> : <ThumbUpOutlinedIcon />}
-                  </Button>
-                  <span>{formatSubscribers(data?.likesCount || 0)}</span>
-                  <span className="border-l"></span>
-                  <Button sx={{ padding: 0, margin: 0 }}>
-                    <ThumbDownOffAltOutlinedIcon />
-                  </Button>
+                <Box className="flex gap-2">
+                  <Box className="flex gap-2 bg-white rounded-full px-3 py-1 items-center">
+                    <Button
+                      onClick={() => setAddModalOpen(true)}
+                      variant="text"
+                      sx={{
+                        minWidth: 0, // remove default min-width
+                        padding: "4px 8px", // small padding
+                        textTransform: "none",
+                        fontSize: "14px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1, // space between icon and text
+                      }}
+                    >
+                      <PlaylistPlayIcon fontSize="small" /> Add
+                    </Button>
+
+                    <AddToPlaylistModal
+                      open={addModalOpen}
+                      handleClose={() => setAddModalOpen(false)}
+                      videoId={videoId}
+                      onAdded={() => fetchApi()} // refresh video/playlist data if needed
+                    />
+                  </Box>
+                </Box>
+                <Box className="flex gap-2">
+                  <Box className="flex gap-2 h-fit bg-white rounded-full py-2 px-4">
+                    <Button onClick={toggleLike} sx={{ padding: 0, margin: 0 }}>
+                      {data?.isLiked ? (
+                        <ThumbUpIcon />
+                      ) : (
+                        <ThumbUpOutlinedIcon />
+                      )}
+                    </Button>
+                    <span>{formatSubscribers(data?.likesCount || 0)}</span>
+                    <span className="border-l"></span>
+                    <Button sx={{ padding: 0, margin: 0 }}>
+                      <ThumbDownOffAltOutlinedIcon />
+                    </Button>
+                  </Box>
                 </Box>
               </Box>
             </Box>
