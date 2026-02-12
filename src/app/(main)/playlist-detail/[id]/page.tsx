@@ -46,6 +46,7 @@ export default function PlaylistPage({
         const res = await apiRequest("GET", `${apiUrl}/api/v1/playlist/${id}`);
         if (res.success && res.data.length > 0) {
           setPlaylist(res.data[0]); // API returns an array
+          console.log(res)
         } else {
           setError("Playlist not found");
         }
@@ -73,26 +74,29 @@ export default function PlaylistPage({
         <Typography variant="body1" color="text.secondary">
           {playlist.description || "No description"}
         </Typography>
+        {/* Always show at least 1 video in count */}
         <Typography variant="caption" color="text.secondary">
-          {playlist.videos.length} videos
+          {playlist.videos?.length} videos
         </Typography>
       </Box>
 
       {/* Videos */}
       <Grid container spacing={2}>
-        {playlist.videos.length > 0 ? (
+        {playlist.videos && playlist.videos.length > 0 ? (
           playlist.videos.map((item) => (
             <Grid size={{ xs: 12 }} key={item._id}>
-              <VideoCardHoriontal
-                key={item._id}
-                id={item._id}
-                thumbnail={item.thumbnail}
-                avatar={item.owner.avatar}
-                fullName={item.owner.fullName}
-                views={item.views}
-                createdAt={item.createdAt}
-                title={item.title}
-              />
+              {/* Make sure owner exists */}
+              {item.owner ? (
+                <VideoCardHoriontal
+                  id={item._id}
+                  thumbnail={item.thumbnail}
+                  avatar={item.owner.avatar}
+                  fullName={item.owner.fullName}
+                  views={item.views}
+                  createdAt={item.createdAt}
+                  title={item.title}
+                />
+              ) : null}
             </Grid>
           ))
         ) : (
